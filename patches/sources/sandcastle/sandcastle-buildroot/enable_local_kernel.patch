@@ -1,0 +1,77 @@
+diff --git a/linux/Config.in b/linux/Config.in
+index a5c736e..199a49a 100644
+--- a/linux/Config.in
++++ b/linux/Config.in
+@@ -99,6 +99,12 @@ config BR2_LINUX_KERNEL_CUSTOM_SVN
+ 	  This option allows Buildroot to get the Linux kernel source
+ 	  code from a Subversion repository.
+ 
++config BR2_LINUX_KERNEL_CUSTOM_LOCAL
++	bool "Custom local source code"
++	help
++	  This option allows Buildroot to get the Linux kernel source
++	  code from a local directory.
++
+ endchoice
+ 
+ config BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE
+@@ -109,6 +115,10 @@ config BR2_LINUX_KERNEL_CUSTOM_TARBALL_LOCATION
+ 	string "URL of custom kernel tarball"
+ 	depends on BR2_LINUX_KERNEL_CUSTOM_TARBALL
+ 
++config BR2_LINUX_KERNEL_CUSTOM_LOCAL_LOCATION
++	string "Path co custom kernel (relative to Buildroot path)"
++	depends on BR2_LINUX_KERNEL_CUSTOM_LOCAL
++
+ if BR2_LINUX_KERNEL_CUSTOM_GIT || BR2_LINUX_KERNEL_CUSTOM_HG || BR2_LINUX_KERNEL_CUSTOM_SVN
+ 
+ config BR2_LINUX_KERNEL_CUSTOM_REPO_URL
+diff --git a/linux/linux.mk b/linux/linux.mk
+index 4b60f33..3e9ba5d 100644
+--- a/linux/linux.mk
++++ b/linux/linux.mk
+@@ -34,6 +34,9 @@ LINUX_SITE_METHOD = hg
+ else ifeq ($(BR2_LINUX_KERNEL_CUSTOM_SVN),y)
+ LINUX_SITE = $(call qstrip,$(BR2_LINUX_KERNEL_CUSTOM_REPO_URL))
+ LINUX_SITE_METHOD = svn
++else ifeq ($(BR2_LINUX_KERNEL_CUSTOM_LOCAL),y)
++LINUX_SITE = $(BR2_LINUX_KERNEL_CUSTOM_LOCAL_LOCATION)
++LINUX_SITE_METHOD = local
+ else ifeq ($(BR2_LINUX_KERNEL_LATEST_CIP_VERSION)$(BR2_LINUX_KERNEL_LATEST_CIP_RT_VERSION),y)
+ LINUX_SOURCE = linux-cip-$(LINUX_VERSION).tar.gz
+ LINUX_SITE = https://git.kernel.org/pub/scm/linux/kernel/git/cip/linux-cip.git/snapshot
+diff --git a/package/linux-headers/linux-headers.mk b/package/linux-headers/linux-headers.mk
+index 80a0775..76e2c20 100644
+--- a/package/linux-headers/linux-headers.mk
++++ b/package/linux-headers/linux-headers.mk
+@@ -14,9 +14,11 @@ LINUX_HEADERS_CUSTOM_TARBALL = $(call qstrip,$(BR2_LINUX_KERNEL_CUSTOM_TARBALL))
+ LINUX_HEADERS_CUSTOM_GIT = $(call qstrip,$(BR2_LINUX_KERNEL_CUSTOM_GIT))
+ LINUX_HEADERS_CUSTOM_HG = $(call qstrip,$(BR2_LINUX_KERNEL_CUSTOM_HG))
+ LINUX_HEADERS_CUSTOM_SVN = $(call qstrip,$(BR2_LINUX_KERNEL_CUSTOM_SVN))
++LINUX_HEADERS_CUSTOM_LOCAL = $(call qstrip,$(BR2_LINUX_KERNEL_CUSTOM_LOCAL))
+ LINUX_HEADERS_VERSION = $(call qstrip,$(BR2_LINUX_KERNEL_VERSION))
+ LINUX_HEADERS_CUSTOM_TARBALL_LOCATION = $(call qstrip,$(BR2_LINUX_KERNEL_CUSTOM_TARBALL_LOCATION))
+ LINUX_HEADERS_REPO_URL = $(call qstrip,$(BR2_LINUX_KERNEL_CUSTOM_REPO_URL))
++LINUX_HEADERS_CUSTOM_LOCAL_LOCATION = $(call qstrip,$(BR2_LINUX_KERNEL_CUSTOM_LOCAL_LOCATION))
+ else # ! BR2_KERNEL_HEADERS_AS_KERNEL
+ LINUX_HEADERS_CUSTOM_TARBALL = $(call qstrip,$(BR2_KERNEL_HEADERS_CUSTOM_TARBALL))
+ LINUX_HEADERS_CUSTOM_GIT = $(call qstrip,$(BR2_KERNEL_HEADERS_CUSTOM_GIT))
+@@ -43,6 +45,9 @@ else ifeq ($(LINUX_HEADERS_CUSTOM_SVN),y)
+ LINUX_HEADERS_SOURCE = linux-$(LINUX_HEADERS_VERSION).tar.gz
+ LINUX_HEADERS_SITE = $(LINUX_HEADERS_REPO_URL)
+ LINUX_HEADERS_SITE_METHOD = svn
++else ifeq ($(LINUX_HEADERS_CUSTOM_LOCAL),y)
++LINUX_HEADERS_SITE = $(LINUX_HEADERS_CUSTOM_LOCAL_LOCATION)
++LINUX_HEADERS_SITE_METHOD = local
+ else ifneq ($(findstring -rc,$(LINUX_HEADERS_VERSION)),)
+ # Since 4.12-rc1, -rc kernels are generated from cgit. This also works for
+ # older -rc kernels.
+@@ -83,7 +88,7 @@ LINUX_HEADERS_POST_PATCH_HOOKS += LINUX_HEADERS_APPLY_LOCAL_PATCHES
+ endif # BR2_KERNEL_HEADERS_AS_KERNEL
+ 
+ # Skip hash checking for custom kernel headers.
+-ifeq ($(BR2_KERNEL_HEADERS_VERSION)$(BR2_KERNEL_HEADERS_CUSTOM_TARBALL)$(BR2_KERNEL_HEADERS_CUSTOM_GIT),y)
++ifeq ($(BR2_KERNEL_HEADERS_VERSION)$(BR2_KERNEL_HEADERS_CUSTOM_TARBALL)$(BR2_KERNEL_HEADERS_CUSTOM_GIT)$(BR2_KERNEL_HEADERS_CUSTOM_LOCAL),y)
+ BR_NO_CHECK_HASH_FOR += $(LINUX_HEADERS_SOURCE)
+ endif
+ 
