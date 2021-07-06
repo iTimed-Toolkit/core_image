@@ -1,4 +1,4 @@
-FROM ubuntu as devel
+FROM ubuntu as parent
 WORKDIR "/root"
 
 ######################################
@@ -19,10 +19,10 @@ RUN echo 'deb https://assets.checkra.in/debian /' | \
 # Install image dependencies
 RUN apt-get update && apt-get install -y                            \
     # general                                                       \
-    wget git build-essential usbutils                               \
+    sudo wget git build-essential usbutils                          \
     # sandcastle                                                    \
     libncurses-dev file cpio zip rsync bc python python3 libssl-dev \
-    # pongo etc
+    # pongo etc                                                     \
     nano clang llvm libusb-1.0-0-dev xxd ld64 cctools-strip
 
 # Get and install checkra1n -- update hash when selecting a new version
@@ -34,7 +34,9 @@ RUN export HASH=dac9968939ea6e6bfbdedeb41d7e2579c4711dc2c5083f91dced66ca397dc51d
 ## Stage 2: Create a build user ##
 ##################################
 
-RUN useradd -ms /bin/bash itimed
+RUN useradd -ms /bin/bash itimed -G sudo
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
 USER itimed
 WORKDIR "/home/itimed"
 
@@ -69,17 +71,19 @@ RUN git clone --depth 1 --branch master --single-branch         \
 ######################################
 
 COPY --chown=itimed ./patches ./patches
-RUN cd ./patches ; ./apply_patches.sh
+RUN cd ./patches && ./apply_patches.sh
 RUN rm -rf ./patches
 
 COPY --chown=itimed ./platforms ./platforms
+COPY --chown=itimed ./env.sh ./env.sh
+ENV ENVFILE=/home/itimed/env.sh
+
+FROM parent as devel
 RUN make -C platforms/linux images
 
-######################################
-## Stage 5: Build the default image ##
-######################################
+FROM parent as default
 
-FROM devel as default
-
-RUN ./platforms/solidify_images.sh
-RUN make -C platforms/linux source-clean
+# Do this as one command to make the final image size small
+RUN make -C platforms/linux images &&   \
+    ./platforms/solidify_images.sh      \
+    make -C platforms/linux source-clean    

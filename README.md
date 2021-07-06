@@ -21,8 +21,9 @@ have two versions of the core image, which we both build from the same Dockerfil
 Both Docker images are automatically built using Github Actions. On a push to the repository,
 the build system automatically builds the images and releases them as packages on the Github
 Container Repository. This should extend to forks of this repository as well, allowing for
-relatively minimal build enviroments on individual researcher hosts. Of course, the Docker
-images can always be built locally using `docker build --target <target> .`, where `<target>`
+relatively minimal build enviroments on individual researcher hosts (although full CI builds
+usually take about 6 hours). Of course, the Docker images can always be built locally by
+cloning this repository and using `docker build --target <target> .`, where `<target>`
 is one of `devel` or `default`.
 
 ## Patching

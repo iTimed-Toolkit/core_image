@@ -1,6 +1,15 @@
 #!/bin/bash
+source "$ENVFILE"
 
-for f in ./linux/images/*
+# Resolve all image symlinks
+for f in $PLATFORM_ROOT/images/*
 do
-    cp --remove-destination $(readlink -f "$f") "$f"
+    if [[ -L "$f" ]]
+    then
+        cp --remove-destination $(readlink -f "$f") "$f"
+    fi
 done
+
+# Also copy host-side toolchain files
+sudo cp $SANDCASTLE_BUILD_ROOT/output/host/* /usr/local/
+

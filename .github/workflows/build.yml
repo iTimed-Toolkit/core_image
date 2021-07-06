@@ -1,8 +1,8 @@
 name: Build images
-#on:
-#    push:
-#        branches:
-#        - master
+on:
+    push:
+        branches:
+        - master
 
 env:
     REGISTRY: ghcr.io
@@ -11,6 +11,14 @@ env:
 jobs:
     build-and-push:
         runs-on: ubuntu-latest
+        strategy:
+          fail-fast: false
+          matrix:
+            target:
+              - devel
+            include:
+              - target: default
+
         steps:
         - name: Checkout repository
           uses: actions/checkout@v2
@@ -33,5 +41,6 @@ jobs:
           with:
             context: .
             push: true
-            tags: ghcr.io/itimed-toolkit/core_image:devel
+            target: ${{ matrix.target }}
+            tags: ghcr.io/itimed-toolkit/core_image:${{ matrix.target }}
             labels: ${{ steps.meta.outputs.labels }}
