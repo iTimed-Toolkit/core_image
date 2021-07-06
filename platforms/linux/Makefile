@@ -1,6 +1,6 @@
 # Various project paths
 
-PROJECT_ROOT          := /root
+PROJECT_ROOT          := /home/itimed
 PLATFORM_ROOT         := $(PROJECT_ROOT)/platforms/linux
 
 SANDCASTLE_ROOT       := $(PROJECT_ROOT)/sources/sandcastle
@@ -76,6 +76,6 @@ clean:
 	rm -rf $(PLATFORM_ROOT)/tools
 
 source-clean:
-	make -C $(PONGO_ROOT) clean
+	make -C $(PONGO_ROOT) distclean
 	make -C $(SANDCASTLE_BUILD_ROOT) clean
 	rm -rf $(SANDCASTLE_BUILD_ROOT)/dl
