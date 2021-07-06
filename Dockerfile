@@ -1,4 +1,4 @@
-FROM ubuntu as parent
+FROM ubuntu AS parent
 WORKDIR "/root"
 
 ######################################
@@ -78,12 +78,10 @@ COPY --chown=itimed ./platforms ./platforms
 COPY --chown=itimed ./env.sh ./env.sh
 ENV ENVFILE=/home/itimed/env.sh
 
-FROM parent as devel
+FROM parent AS devel
 RUN make -C platforms/linux images
 
-FROM parent as default
-
-# Do this as one command to make the final image size small
-RUN make -C platforms/linux images &&   \
-    ./platforms/solidify_images.sh      \
-    make -C platforms/linux source-clean    
+FROM parent AS default
+COPY --from=devel ./platforms/linux/images/ ./platforms/linux/images
+COPY --from=devel ./sources/sandcastle/sandcastle-buildroot/output/host/* \
+                    /usr/local/
