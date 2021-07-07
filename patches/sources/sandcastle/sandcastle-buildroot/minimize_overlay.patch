@@ -1,0 +1,184 @@
+diff --git a/sandcastle-overlay/etc/X11/xorg.conf b/sandcastle-overlay/etc/X11/xorg.conf
+deleted file mode 100644
+index 352d0f5..0000000
+--- a/sandcastle-overlay/etc/X11/xorg.conf
++++ /dev/null
+@@ -1,11 +0,0 @@
+-Section "InputDevice"
+-    Identifier "touchscreen"
+-    Driver "evdev"
+-    Option "Device" "/dev/input/event0"
+-    Option "Emulate3Buttons" "True"
+-EndSection                    
+-          
+-Section "ServerLayout"
+-    Identifier  "touchscreen"
+-    InputDevice "touchscreen" "Pointer"
+-EndSection  
+diff --git a/sandcastle-overlay/etc/fstab b/sandcastle-overlay/etc/fstab
+index 53efbc0..334fd21 100644
+--- a/sandcastle-overlay/etc/fstab
++++ b/sandcastle-overlay/etc/fstab
+@@ -7,4 +7,4 @@ tmpfs		/tmp		tmpfs	mode=1777	0	0
+ tmpfs		/run		tmpfs	mode=0755,nosuid,nodev	0	0
+ sysfs		/sys		sysfs	defaults	0	0
+ none 		/config 	configfs rw,relatime 	0 	0
+-/dev/nvme0n1p1  /hostfs 	apfs    ro,relatime     0       0
++#/dev/nvme0n1p1  /hostfs 	apfs    ro,relatime     0       0
+diff --git a/sandcastle-overlay/etc/hw/hx-touch.fwlist b/sandcastle-overlay/etc/hw/hx-touch.fwlist
+deleted file mode 100755
+index aabf313..0000000
+--- a/sandcastle-overlay/etc/hw/hx-touch.fwlist
++++ /dev/null
+@@ -1,3 +0,0 @@
+-C1F5D,2 /hostfs/usr/share/firmware/multitouch/D10.mtprops
+-C1F5E,2 /hostfs/usr/share/firmware/multitouch/D11.mtprops
+-C1F58,1 /hostfs/usr/share/firmware/multitouch/N112.mtprops
+diff --git a/sandcastle-overlay/etc/init.d/S30hx-touchd b/sandcastle-overlay/etc/init.d/S30hx-touchd
+deleted file mode 100755
+index 60f9d89..0000000
+--- a/sandcastle-overlay/etc/init.d/S30hx-touchd
++++ /dev/null
+@@ -1,40 +0,0 @@
+-#!/bin/sh
+-#
+-# Starts hx-touchd
+-#
+-
+-start() {
+-	HX_TOUCHD_ARGS="/etc/hw/hx-touch.fwlist /dev/nvme0n3"
+-	printf "Starting hx-touchd: "
+-	umask 077
+-
+-	start-stop-daemon -S -b -q -p /var/run/hx-touchd.pid \
+-		--exec /usr/bin/hx-touchd $HX_TOUCHD_ARGS
+-	[ $? = 0 ] && echo "OK" || echo "FAIL"
+-}
+-stop() {
+-	printf "Stopping hx-touchd: "
+-	start-stop-daemon -K -q -p /var/run/hx-touchd.pid
+-	[ $? = 0 ] && echo "OK" || echo "FAIL"
+-}
+-restart() {
+-	stop
+-	start
+-}
+-
+-case "$1" in
+-  start)
+-  	start
+-	;;
+-  stop)
+-  	stop
+-	;;
+-  restart|reload)
+-  	restart
+-	;;
+-  *)
+-	echo "Usage: $0 {start|stop|restart}"
+-	exit 1
+-esac
+-
+-exit $?
+diff --git a/sandcastle-overlay/etc/init.d/S40xorg b/sandcastle-overlay/etc/init.d/S40xorg
+deleted file mode 100755
+index 2ba2af9..0000000
+--- a/sandcastle-overlay/etc/init.d/S40xorg
++++ /dev/null
+@@ -1,47 +0,0 @@
+-#!/bin/sh
+-#
+-# Starts Xorg
+-#
+-
+-BIN=/usr/bin/Xorg
+-PIDFILE=/var/run/xorg.pid
+-
+-# ":0.0 vt01" makes sure Xorg finds the correct terminal.
+-# -allowMouseOpenFail allows the server to start up even if the mouse device
+-#   can't be opened or initialised.
+-# -noreset prevents a server reset when the last client connection is closed.
+-XORG_ARGS=":0.0 vt01 -s 0 -noreset -allowMouseOpenFail -retro"
+-
+-start() {
+-	printf "Starting Xorg: "
+-	export DISPLAY=:0
+-	start-stop-daemon -S -q -b -m -p $PIDFILE --exec $BIN -- $XORG_ARGS
+-	[ $? = 0 ] && sleep 3 && /usr/bin/feh --bg-center '/usr/share/feh/images/clogo.png' && echo "OK" || echo "FAIL"
+-}
+-
+-stop() {
+-	printf "Stopping Xorg: "
+-	start-stop-daemon -K -q -p $PIDFILE
+-	[ $? = 0 ] && echo "OK" || echo "FAIL"
+-}
+-
+-restart() {
+-	stop
+-	sleep 2
+-	start
+-}
+-
+-case "$1" in
+-	start)
+-		start
+-	;;
+-	stop)
+-		stop
+-	;;
+-	restart|reload)
+-		restart
+-	;;
+-	*)
+-		echo "Usage: $0 {start|stop|restart}"
+-	exit 1
+-esac
+diff --git a/sandcastle-overlay/etc/init.d/S50-bluetoothd b/sandcastle-overlay/etc/init.d/S50-bluetoothd
+deleted file mode 100755
+index b18b6bc..0000000
+--- a/sandcastle-overlay/etc/init.d/S50-bluetoothd
++++ /dev/null
+@@ -1,39 +0,0 @@
+-#!/bin/sh
+-#
+-# Starts bluetoothd
+-#
+-
+-start() {
+-	printf "Starting bluetoothd: "
+-	umask 077
+-
+-	start-stop-daemon -S -b -q -p /var/run/bluetoothd.pid \
+-		--exec /usr/libexec/bluetooth/bluetoothd
+-	[ $? = 0 ] && echo "OK" || echo "FAIL"
+-}
+-stop() {
+-	printf "Stopping bluetoothd: "
+-	start-stop-daemon -K -q -p /var/run/bluetoothd.pid
+-	[ $? = 0 ] && echo "OK" || echo "FAIL"
+-}
+-restart() {
+-	stop
+-	start
+-}
+-
+-case "$1" in
+-  start)
+-  	start
+-	;;
+-  stop)
+-  	stop
+-	;;
+-  restart|reload)
+-  	restart
+-	;;
+-  *)
+-	echo "Usage: $0 {start|stop|restart}"
+-	exit 1
+-esac
+-
+-exit $?
+diff --git a/sandcastle-overlay/usr/share/feh/images/clogo.png b/sandcastle-overlay/usr/share/feh/images/clogo.png
+deleted file mode 100644
+index 06d9449..0000000
+Binary files a/sandcastle-overlay/usr/share/feh/images/clogo.png and /dev/null differ
