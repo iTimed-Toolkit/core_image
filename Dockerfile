@@ -1,4 +1,4 @@
-FROM ubuntu AS parent
+FROM ubuntu AS clean
 WORKDIR "/root"
 
 ######################################
@@ -78,10 +78,11 @@ COPY --chown=itimed ./platforms ./platforms
 COPY --chown=itimed ./env.sh ./env.sh
 ENV ENVFILE=/home/itimed/env.sh
 
-FROM parent AS devel
+FROM clean AS devel
 RUN make -C platforms/linux images
 
-FROM parent AS default
-COPY --from=devel ./platforms/linux/images/ ./platforms/linux/images
-COPY --from=devel ./sources/sandcastle/sandcastle-buildroot/output/host/* \
+FROM clean AS default
+COPY --from=devel /home/itimed/platforms/linux/images/* \
+                    /home/itimed/platforms/linux/images/
+COPY --from=devel /home/itimed/sources/sandcastle/sandcastle-buildroot/output/host/ \
                     /usr/local/

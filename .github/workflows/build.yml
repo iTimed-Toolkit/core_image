@@ -15,8 +15,9 @@ jobs:
           fail-fast: false
           matrix:
             target:
-              - devel
+              - clean
             include:
+              - target: devel
               - target: default
 
         steps:
