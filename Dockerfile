@@ -14,6 +14,7 @@ RUN apt-get update && apt-get install -y gnupg ca-certificates
 # but we still need this repository for ld64 and cctools-strip 
 RUN echo 'deb https://assets.checkra.in/debian /' | \
     tee /etc/apt/sources.list.d/checkra1n.list &&   \
+    APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1          \
     apt-key adv --fetch-keys https://assets.checkra.in/debian/archive.key
 
 # Install image dependencies
@@ -79,7 +80,7 @@ COPY --chown=itimed ./env.sh ./env.sh
 ENV ENVFILE=/home/itimed/env.sh
 
 FROM clean AS devel
-RUN make -C platforms/linux images
+RUN . "$ENVFILE" && make -C platforms/linux images
 
 FROM clean AS default
 COPY --from=devel /home/itimed/platforms/linux/images/* \
