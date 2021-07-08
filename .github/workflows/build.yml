@@ -1,6 +1,6 @@
 name: Build images
 on:
-    push:
+    release:
         branches:
         - master
 
