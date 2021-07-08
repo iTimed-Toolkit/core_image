@@ -71,6 +71,10 @@ RUN git clone --depth 1 --branch master --single-branch         \
 ## Stage 4: Patch and build sources ##
 ######################################
 
+COPY --chown=itimed ./overlay ./overlay
+RUN cd ./overlay && ./apply_overlay.sh
+RUN rm -rf ./overlay
+
 COPY --chown=itimed ./patches ./patches
 RUN cd ./patches && ./apply_patches.sh
 RUN rm -rf ./patches
