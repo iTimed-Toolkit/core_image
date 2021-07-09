@@ -40,6 +40,8 @@ Talk about patches under patches directory.
 Talk about how to actually use these images and platforms -- USB passthrough, considerations,
 etc
 
+`docker run --privileged -v /dev/bus/usb/:/dev/bus/usb/ -it core_image`
+
 ## Common changes
 
  - Linux kernel command line in arch/arm64/boot/dtx/hx/...

@@ -1,0 +1,13 @@
+diff --git a/src/shell/usbloader.c b/src/shell/usbloader.c
+index 7babdaa..f13d122 100644
+--- a/src/shell/usbloader.c
++++ b/src/shell/usbloader.c
+@@ -29,7 +29,7 @@
+ #include <mach-o/nlist.h>
+ #include <mach-o/reloc.h>
+ 
+-#define UPLOADSZ (1024 * 1024)
++#define UPLOADSZ (1024 * 1024 * 64)
+ #define UPLOADSZ_MAX (1024 * 1024 * 128)
+ 
+ uint8_t * loader_xfer_recv_data;

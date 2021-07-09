@@ -1,0 +1,15 @@
+diff --git a/package/busybox/busybox.config b/package/busybox/busybox.config
+index 1ea810e..9351caa 100644
+--- a/package/busybox/busybox.config
++++ b/package/busybox/busybox.config
+@@ -676,8 +676,8 @@ CONFIG_SWAPON=y
+ CONFIG_SWAPOFF=y
+ CONFIG_FEATURE_SWAPONOFF_LABEL=y
+ CONFIG_SWITCH_ROOT=y
+-# CONFIG_TASKSET is not set
+-# CONFIG_FEATURE_TASKSET_FANCY is not set
++CONFIG_TASKSET=y
++CONFIG_FEATURE_TASKSET_FANCY=y
+ CONFIG_UEVENT=y
+ CONFIG_UMOUNT=y
+ CONFIG_FEATURE_UMOUNT_ALL=y

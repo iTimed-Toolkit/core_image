@@ -178,6 +178,27 @@ index b18b6bc..0000000
 -esac
 -
 -exit $?
+diff --git a/sandcastle-overlay/etc/profile b/sandcastle-overlay/etc/profile
+index cec2865..ffee5aa 100644
+--- a/sandcastle-overlay/etc/profile
++++ b/sandcastle-overlay/etc/profile
+@@ -2,13 +2,13 @@ export PATH="/bin:/sbin:/usr/bin:/usr/sbin"
+ 
+ if [ "$PS1" ]; then
+ 	if [ "`id -u`" -eq 0 ]; then
+-		export PS1='# '
++		export PS1='$(whoami)@$(hostname):$(pwd) # '
+ 	else
+-		export PS1='$ '
++		export PS1='$(whoami)@$(hostname):$(pwd) $ '
+ 	fi
+ fi
+ 
+-export EDITOR='/bin/vi'
++export EDITOR='/bin/nano'
+ 
+ # Source configuration files from /etc/profile.d
+ for i in /etc/profile.d/*.sh ; do
 diff --git a/sandcastle-overlay/usr/share/feh/images/clogo.png b/sandcastle-overlay/usr/share/feh/images/clogo.png
 deleted file mode 100644
 index 06d9449452e51118ef1249d2cd0b402da2a63c9e..0000000000000000000000000000000000000000
