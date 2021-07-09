@@ -50,7 +50,7 @@ WORKDIR "/home/itimed"
 # layout, so make sure to update those references too if
 # updating this.
 
-RUN mkdir -p sources && mkdir -p sources/sandcastle
+RUN mkdir -p sources/sandcastle
 RUN git clone --depth 1 --branch sandcastle-5.4 --single-branch \
     https://github.com/corellium/linux-sandcastle               \
     sources/sandcastle/linux-sandcastle
@@ -71,17 +71,14 @@ RUN git clone --depth 1 --branch master --single-branch         \
 ## Stage 4: Patch and build sources ##
 ######################################
 
-COPY --chown=itimed ./overlay ./overlay
-RUN cd ./overlay && ./apply_overlay.sh
-RUN rm -rf ./overlay
-
-COPY --chown=itimed ./patches ./patches
-RUN cd ./patches && ./apply_patches.sh
-RUN rm -rf ./patches
-
 COPY --chown=itimed ./platforms ./platforms
 COPY --chown=itimed ./env.sh ./env.sh
 ENV ENVFILE=/home/itimed/env.sh
+
+COPY --chown=itimed ./overlay ./overlay
+RUN . "$ENVFILE" && ./overlay/apply_overlay.sh && rm -rf ./overlay
+COPY --chown=itimed ./patches ./patches
+RUN . "$ENVFILE" && ./patches/apply_patches.sh && rm -rf ./patches
 
 FROM clean AS devel
 RUN . "$ENVFILE" && make -C platforms/linux images

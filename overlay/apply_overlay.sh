@@ -1,8 +1,6 @@
 #!/bin/bash
 
-currdir=$(pwd)
-FILES=$(find . -type f)
-
+FILES=$(cd "$PROJECT_ROOT/overlay" ; find . -type f)
 for f in $FILES
 do
     # skip copying this script
@@ -15,8 +13,8 @@ do
     fname=$(basename "$f")
 
     # paths correspond to the containing directory of overlay/
-    mkdir -p "../$fpath"
-    if ! cp "$f" "../$fpath/"
+    mkdir -p "$PROJECT_ROOT/$fpath"
+    if ! cp "$PROJECT_ROOT/overlay/$f" "$PROJECT_ROOT/$fpath/"
     then
         echo "Failed to overlay $fname"
         exit -1
