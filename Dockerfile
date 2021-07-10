@@ -81,6 +81,8 @@ COPY --chown=itimed ./patches ./patches
 RUN . "$ENVFILE" && ./patches/apply_patches.sh && rm -rf ./patches
 
 FROM clean AS devel
+RUN make -C sources/sandcastle/sandcastle-buildroot linux-rebuild
+RUN make -C sources/sandcastle/sandcastle-buildroot
 RUN . "$ENVFILE" && make -C platforms/linux images
 
 FROM clean AS default

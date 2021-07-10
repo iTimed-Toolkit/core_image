@@ -42,6 +42,42 @@ etc
 
 `docker run --privileged -v /dev/bus/usb/:/dev/bus/usb/ -it core_image`
 
+## Connecting
+
+Three methods in order of complexity: USB gadget interface, serial cable, WiFi. For each of
+these, we can use the default login of `root` with password `alpine`.
+
+### USB gadget
+The USB gadget interface is enabled by default and should bring up a new network interface
+on your host machine when booting into Project Sandcastle (on mine, its `enp0s20f0u1u1`).
+You'll want to reconfigure any NetworkManager or analogue to not manage this interface --
+for me, adding these lines to my `/etc/NetworkManager/NetworkManager.conf` worked:
+
+```
+[main]
+plugins=keyfile
+
+[keyfile]
+unmanaged-devices=interface-name:enp0s20f0u1u1
+```
+
+Then, you need to set the IP address for this interface. On my Linux system, doing the
+following worked for me. Note that the specific IP address is configured in
+`sources/sandcastle/sandcastle-buildroot/sandcastle-overlay/etc/network/intefaces` so
+you can change this -- by default, though, you can just use `172.16.1.2/24`.
+
+```
+sudo ip addr add 172.16.1.2/24 dev enp0s20f0u1u1
+```
+
+### Serial
+
+Todo
+
+### WiFi
+
+Does NOT work by default, but explain series of steps for making it work
+
 ## Common changes
 
  - Linux kernel command line in arch/arm64/boot/dtx/hx/...
