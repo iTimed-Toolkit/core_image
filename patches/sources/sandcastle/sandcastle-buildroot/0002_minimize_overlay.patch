@@ -16,14 +16,16 @@ index 352d0f5..0000000
 -    InputDevice "touchscreen" "Pointer"
 -EndSection  
 diff --git a/sandcastle-overlay/etc/fstab b/sandcastle-overlay/etc/fstab
-index 53efbc0..334fd21 100644
+index 53efbc0..9b7dd7d 100644
 --- a/sandcastle-overlay/etc/fstab
 +++ b/sandcastle-overlay/etc/fstab
-@@ -7,4 +7,4 @@ tmpfs		/tmp		tmpfs	mode=1777	0	0
+@@ -6,5 +6,5 @@ tmpfs		/dev/shm	tmpfs	mode=0777	0	0
+ tmpfs		/tmp		tmpfs	mode=1777	0	0
  tmpfs		/run		tmpfs	mode=0755,nosuid,nodev	0	0
  sysfs		/sys		sysfs	defaults	0	0
- none 		/config 	configfs rw,relatime 	0 	0
+-none 		/config 	configfs rw,relatime 	0 	0
 -/dev/nvme0n1p1  /hostfs 	apfs    ro,relatime     0       0
++none 		/config 	configfs rw,noauto,relatime 	0 	0
 +#/dev/nvme0n1p1  /hostfs 	apfs    ro,relatime     0       0
 diff --git a/sandcastle-overlay/etc/hw/hx-touch.fwlist b/sandcastle-overlay/etc/hw/hx-touch.fwlist
 deleted file mode 100755
@@ -178,6 +180,20 @@ index b18b6bc..0000000
 -esac
 -
 -exit $?
+diff --git a/sandcastle-overlay/etc/network/usb0-up b/sandcastle-overlay/etc/network/usb0-up
+index 2b69d6a..316a464 100755
+--- a/sandcastle-overlay/etc/network/usb0-up
++++ b/sandcastle-overlay/etc/network/usb0-up
+@@ -1,6 +1,9 @@
+ #!/bin/sh
+ IF_WAIT_DELAY=5
+ IFACE=usb0
++
++mkdir /config
++mount /config
+ mkdir /config/usb_gadget/g1
+ echo "0x18d1" > /config/usb_gadget/g1/idVendor
+ echo "0x0223" > /config/usb_gadget/g1/bcdDevice
 diff --git a/sandcastle-overlay/etc/profile b/sandcastle-overlay/etc/profile
 index cec2865..ffee5aa 100644
 --- a/sandcastle-overlay/etc/profile

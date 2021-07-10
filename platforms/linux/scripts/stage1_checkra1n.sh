@@ -9,8 +9,7 @@ fi
 
 DFU_EXISTS=$(lsusb -d 05ac:1227)
 if [[ "$DFU_EXISTS" != "" ]]; then
-    checkra1n -c -k $1 -p -E
-#    sudo checkra1n -c -p -E
+    sudo checkra1n -c -k $1 -p -E
     exit 0
 fi
 
