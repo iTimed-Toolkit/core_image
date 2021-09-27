@@ -33,7 +33,10 @@ is one of `clean`, `devel`, or `default`.
 
 ## Patching {#patching}
 
-Talk about patches under patches directory.
+Before sources are built, it is often useful to apply custom patches or add new files into the
+source code trees. The `patches/` and `overlay/` directories are precisely for this. Any patch
+files found in the `patches/` directory are automatically applied to the source tree -- similarly,
+any files under `overlay/` are copied to the specified location.
 
 ## Usage
 
